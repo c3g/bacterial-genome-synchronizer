@@ -1,0 +1,53 @@
+{
+  "name": "portal",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=production node ./bin/www",
+    "watch:server": "NODE_ENV=development PORT=3001 nodemon --ignore client --ignore public ./bin/www",
+    "watch:all": "NODE_ENV=development nodemon -i client/dist --exec 'cd client && npm run build-dist && cd .. && node --inspect bin/www'",
+    "watch:frontend": "cd client && npm start",
+    "build": "rm -rf ./public && mkdir public && cd client && npm run build && cp -r build/* ../public",
+    "postinstall": "cd client && npm install"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react-app": "^3.1.1",
+    "babel-register": "^6.26.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "~1.17.1",
+    "chalk": "^2.3.2",
+    "clipboardy": "^1.2.3",
+    "compression": "^1.7.2",
+    "connect-flash": "^0.1.1",
+    "connect-sqlite3": "^0.9.11",
+    "cookie-parser": "~1.4.3",
+    "csv-parse": "^2.0.4",
+    "csv-string": "^3.1.2",
+    "express": "~4.15.2",
+    "express-csp-header": "^2.1.0",
+    "express-range": "^2.0.1",
+    "express-session": "^1.15.6",
+    "helmet": "^3.12.0",
+    "ignore-styles": "^5.0.1",
+    "inquirer": "^5.1.0",
+    "jade": "~1.11.0",
+    "morgan": "~1.8.1",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "ramda": "^0.24.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2",
+    "request-promise-native": "^1.0.5",
+    "rimraf": "^2.6.2",
+    "serve-favicon": "~2.4.2",
+    "sqlite3": "^4.0.4",
+    "twilio": "^3.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  }
+}
