@@ -1,14 +1,18 @@
+html, body {
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 .App {
   text-align: center;
 }
+.App__header {
+  /* background-color: #282c34; */
+  background-color: #4d5057;
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-}
-
-.App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -17,16 +21,159 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
-.App-link {
+.App__link {
   color: #61dafb;
 }
+.App__steps {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.text-muted {
+  color: #787c7f;
+}
+
+.link {
+  color: #2297de;
+  padding: 0;
+  width: 100%;
+}
+
+.Step {
+  position: relative;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+}
+.Step__icon {
+  opacity: 0.2;
+  height: 80px;
+}
+.Step.active .Step__icon{
+  opacity: 1;
+}
+.Step__separator {
+  position: absolute;
+  top: 37px;
+  left: -68px;
+  display: inline-block;
+  width: 125px;
+  height: 2px;
+  background-color: white;
+  opacity: 0.2;
+}
+.Step.active .Step__separator {
+  opacity: 1;
+}
+.Step__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1em 0;
+}
+.Step__or {
+  position: relative;
+  font-size: 1rem;
+  font-weight: bold;
+  width: 200px;
+  margin: 2em 0;
+  opacity: 0.6;
+}
+.Step__or::before,
+.Step__or::after {
+  content: '';
+  position: absolute;
+  display: inline-block;
+  width: 40%;
+  height: 1px;
+  background-color: white;
+  top: 8px;
+}
+.Step__or::before {
+  left: 0;
+}
+.Step__or::after {
+  right: 0;
+}
+
+
+.SequenceInput {
+  padding: 0;
+  font-family: inherit;
+  font-weight: 400;
+  border-radius: 3px;
+  border: 0;
+  margin: 0;
+  min-width: auto;
+  vertical-align: middle;
+  font-size: inherit;
+  line-height: 48px;
+  text-align: center;
+  color: #111;
+  background-color: #eee;
+  border: 1px solid #2297DE;
+  /* height: 36px; */
+  transition-property: color,background,border-color;
+  transition-duration: .1s;
+  transition-timing-function: ease-in;
+  outline: none;
+
+  width: 200px;
+  height: 48px;
+  font-size: 16px;
+  margin: auto;
+  overflow: hidden;
+}
+
+
+.Button {
+  padding: 0 30px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+  border-radius: 3px;
+  text-decoration: none;
+  border: 0;
+  margin: 0;
+  min-width: auto;
+  vertical-align: middle;
+  font-size: inherit;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+  background: #2297DE;
+  color: #fff;
+  height: 36px;
+  transition-property: color,background,border-color;
+  transition-duration: .1s;
+  transition-timing-function: ease-in;
+  outline: none;
+
+  width: 200px;
+  height: 48px;
+  font-size: 16px;
+  margin: auto;
+  overflow: hidden;
+}
+.Button:hover {
+  color: #fff;
+  background-color: rgba(34,151,222,0.7);
+}
+.Button:active {
+  color: #fff;
+  background-color: hsl(202.70000000000005,74%,40.2%);
+}
+.Button[disabled] {
+  pointer-events: none;
+  background-color: #3a3c41;
+  color: #787c7f;
+  cursor: initial;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  box-shadow: none;
 }
