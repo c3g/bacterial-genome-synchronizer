@@ -110,11 +110,15 @@ class Input extends React.Component {
     } = this.props
     /* eslint-enable no-unused-vars */
 
-    const actualValue = this.getValue()
+    const actualValue =
+      this.props.defaultValue ?
+        undefined :
+        this.getValue()
 
-    const actualStatus = status || ((validate && actualValue) ?
-      (validate(actualValue) ? 'success' : 'error') :
-      undefined)
+    const actualStatus =
+      (status || ((validate && actualValue)) ?
+        (validate(actualValue) ? 'success' : 'error') :
+        undefined)
 
     const inputClassName = classname(
       'Input',

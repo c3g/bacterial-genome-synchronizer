@@ -40,9 +40,13 @@ class App extends Component {
     }
   }
 
-  addInput(type, id) {
+  addEntry(type, id) {
     const entry = { type, id, isValid: true, isLoading: true, data: undefined }
     this.setState(state => ({ entries: state.entries.concat(entry) }))
+  }
+
+  removeEntry(id) {
+    this.setState({ entries: this.state.entries.filter(e => e.id !== id) })
   }
 
   unsetEntries = () => {
@@ -57,7 +61,7 @@ class App extends Component {
     openFile({ multiple: true, accept: '.fasta,.txt' })
     .then(files => {
       files.forEach(file => {
-        this.addInput(ENTRY_TYPE.FILE, file.name)
+        this.addEntry(ENTRY_TYPE.FILE, file.name)
 
         readFileAsText(file)
         .then(data => {
@@ -77,7 +81,7 @@ class App extends Component {
   onEnterAccession = (value) => {
     const accessions = value.split(/( +)|( *, *)/).filter(a => Boolean(a) && !/^ *$/.test(a))
     accessions.forEach(accession => {
-      this.addInput(ENTRY_TYPE.ACCESSION, accession)
+      this.addEntry(ENTRY_TYPE.ACCESSION, accession)
 
       fetchNCBI(accession)
       .then(result => {
@@ -94,14 +98,17 @@ class App extends Component {
   onSelectStart = () => {
     openFile({ accept: '.fasta,.txt' })
     .then(file => {
-      const start = { type: ENTRY_TYPE.FILE, id: file.name, isLoading: true, data: undefined }
+      const start = { type: ENTRY_TYPE.FILE, id: file.name, isValid: true, isLoading: true, data: undefined }
 
       this.setState({ start })
 
       readFileAsText(file)
-      .then(data => {
+      .then(content => {
+        const data = content.trim().toUpperCase()
+        const start = { ...this.state.start, isValid: isATCG(data), isLoading: false, data }
+
         this.setState({
-          start: { ...this.state.start, isLoading: false, data }
+          start: start
         })
 
       })
@@ -109,7 +116,7 @@ class App extends Component {
   }
 
   onEnterStart = (value) => {
-    const start = { type: ENTRY_TYPE.TEXT, id: 'text', isLoading: false, data: value }
+    const start = { type: ENTRY_TYPE.TEXT, id: 'text', isLoading: false, data: value.toUpperCase() }
 
     this.setState({ start })
   }
@@ -119,7 +126,7 @@ class App extends Component {
 
   renderInputStep() {
     const { entries } = this.state
-    const hasInvalidEntries = entries.some(e => e.isInvalid)
+    const hasInvalidEntries = entries.some(e => e.isValid === false)
 
     return (
       <div className='Step active'>
@@ -160,6 +167,7 @@ class App extends Component {
                     icon='close'
                     iconButton
                     loading={entry.isLoading}
+                    onClick={() => this.removeEntry(entry.id)}
                   />
                 </div>
               </div>
@@ -168,9 +176,9 @@ class App extends Component {
           </div>
           {
             hasInvalidEntries &&
-              <div className='text-error bold'>
+              <p className='text-error bold'>
                 Some files are not FASTA files. Please remove them.
-              </div>
+              </p>
           }
           {
             entries.length > 0 &&
@@ -186,7 +194,7 @@ class App extends Component {
   renderStartStep() {
     const { entries, start } = this.state
 
-    const isActive = entries.length > 0
+    const isActive = entries.length > 0 && !entries.some(e => e.isValid === false)
     const className = cx('Step', { active: isActive })
 
     return (
@@ -203,7 +211,9 @@ class App extends Component {
               <Input
                 className='MainInput'
                 placeholder='Paste it: AACGATCGACTGATC'
+                pattern='[atcgATCG]'
                 disabled={!isActive}
+                onKeyPress={onKeyPressFilterATCG}
                 onEnter={this.onEnterStart}
               />
             </div>
@@ -225,18 +235,27 @@ class App extends Component {
         {
           start !== undefined && start.type === ENTRY_TYPE.FILE &&
             <div className='Step__content'>
-              <div className='StartStep__value'>
-                {start.data}
-              </div>
+              {
+                start.isValid && start.data &&
+                  <div className='StartStep__value'>
+                    {start.data.slice(0, 200)}
+                  </div>
+              }
               {
                 start.isLoading &&
                   <Spinner />
               }
               {
-                !start.isLoading &&
+                !start.isLoading && start.isValid &&
                   <div className='StartStep__length'>
                     Length: {start.data.length} bases
                   </div>
+              }
+              {
+                !start.isValid &&
+                  <p className='text-error bold'>
+                    This files isn't a sequence of ATCG bases. Please change it.
+                  </p>
               }
               {
                 !start.isLoading &&
@@ -253,7 +272,7 @@ class App extends Component {
   renderProcessStep() {
     const { entries, start } = this.state
 
-    const shouldActivate = entries.length > 0 && start !== undefined
+    const shouldActivate = entries.length > 0 && (start !== undefined && start.isValid)
     const isLoading = shouldActivate && (entries.some(e => e.isLoading) || (start !== undefined && start.isLoading))
     const isActive = shouldActivate && !isLoading
 
@@ -311,6 +330,13 @@ function getEntryIconName(entryType) {
     default:
       throw new Error('unreachable')
   }
+}
+
+function onKeyPressFilterATCG(ev) {
+  const { key, code } = ev
+
+  if (key.length === 1 && !isATCG(key))
+    ev.preventDefault()
 }
 
 export default App;
