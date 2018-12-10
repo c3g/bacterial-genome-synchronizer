@@ -1,10 +1,4 @@
-html, body {
-  font-size: 14px;
-}
-
-* {
-  box-sizing: border-box;
-}
+@import '../styles/_variables.scss';
 
 .App {
   text-align: center;
@@ -18,7 +12,7 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /* font-size: calc(10px + 2vmin); */
   color: white;
 }
 .App__link {
@@ -28,25 +22,17 @@ html, body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  height: 350px;
 }
 
-
-.text-muted {
-  color: #787c7f;
-}
-
-.link {
-  color: #2297de;
-  padding: 0;
-  width: 100%;
-}
 
 .Step {
   position: relative;
-  width: 300px;
+  width: 200px;
   display: flex;
   flex-direction: column;
   align-self: stretch;
+  margin: 0 50px;
 }
 .Step__icon {
   opacity: 0.2;
@@ -58,7 +44,7 @@ html, body {
 .Step__separator {
   position: absolute;
   top: 37px;
-  left: -68px;
+  left: -110px;
   display: inline-block;
   width: 125px;
   height: 2px;
@@ -80,6 +66,9 @@ html, body {
   font-weight: bold;
   width: 200px;
   margin: 2em 0;
+  opacity: 0.2;
+}
+.Step.active .Step__or {
   opacity: 0.6;
 }
 .Step__or::before,
@@ -100,8 +89,30 @@ html, body {
 }
 
 
-.SequenceInput {
-  padding: 0;
+.InputStep__entries {
+  margin-bottom: 1em;
+  width: 100%;
+}
+
+
+.StartStep__value {
+  height: 40px;
+  line-height: 40px;
+  font-size: 13px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.StartStep__length {
+  color: $text-color-muted;
+  height: 40px;
+  font-size: 13px;
+}
+
+
+.MainInput > .Input__element {
+  padding: 0 0.5em;
   font-family: inherit;
   font-weight: 400;
   border-radius: 3px;
@@ -127,53 +138,27 @@ html, body {
   margin: auto;
   overflow: hidden;
 }
-
-
-.Button {
-  padding: 0 30px;
-  font-family: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 400;
-  border-radius: 3px;
-  text-decoration: none;
-  border: 0;
-  margin: 0;
-  min-width: auto;
-  vertical-align: middle;
-  font-size: inherit;
-  line-height: 1.1;
-  text-align: center;
-  cursor: pointer;
-  background: #2297DE;
-  color: #fff;
-  height: 36px;
-  transition-property: color,background,border-color;
-  transition-duration: .1s;
-  transition-timing-function: ease-in;
-  outline: none;
-
-  width: 200px;
-  height: 48px;
-  font-size: 16px;
-  margin: auto;
-  overflow: hidden;
-}
-.Button:hover {
-  color: #fff;
-  background-color: rgba(34,151,222,0.7);
-}
-.Button:active {
-  color: #fff;
-  background-color: hsl(202.70000000000005,74%,40.2%);
-}
-.Button[disabled] {
-  pointer-events: none;
-  background-color: #3a3c41;
-  color: #787c7f;
-  cursor: initial;
+.MainInput > .Input__element[disabled]{
+  background-color: rgb(64, 67, 73);
+  border-color: grey;
+  color: #8b8b8b;
   opacity: 0.65;
-  filter: alpha(opacity=65);
-  box-shadow: none;
+}
+
+
+.Entry {
+  display: flex;
+  width: 100%;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: left;
+  align-items: center;
+}
+.Entry__id {
+  flex: 1;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.Entry__icon .Button {
+  color: white !important;
 }
