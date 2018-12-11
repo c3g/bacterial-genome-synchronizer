@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import path from 'path'
 import cx from 'classname'
+import truncateMiddle from 'truncate-middle'
 
 import addIcon from '../static/baseline-add_box-24px.svg';
 import fingerprintIcon from '../static/baseline-fingerprint-24px.svg';
@@ -10,10 +12,11 @@ import Button from './Button'
 import Icon from './Icon'
 import Input from './Input'
 import Spinner from './Spinner'
+import download from '../helpers/download'
 import openFile from '../helpers/open-file'
 import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
-import { validateFastaFile, isATCG } from '../helpers/fasta'
+import { fastaToString, realignFasta, validateFastaFile, isATCG } from '../helpers/fasta'
 
 const ENTRY_TYPE = {
   ACCESSION: 'ACCESSION',
@@ -30,14 +33,19 @@ const ENTRY_TYPE = {
  * @property {string} data
  */
 
+
+const INITIAL_STATE = {
+  entries: [],
+  start: undefined,
+  startMessage: undefined,
+  realignments: [],
+}
+
 class App extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      entries: [],
-      start: undefined,
-    }
+    this.state = INITIAL_STATE
   }
 
   addEntry(type, id) {
@@ -49,12 +57,33 @@ class App extends Component {
     this.setState({ entries: this.state.entries.filter(e => e.id !== id) })
   }
 
-  unsetEntries = () => {
+  resetInput = () => {
     this.setState({ entries: [] })
+    this.resetProcess()
   }
 
-  unsetStart = () => {
+  resetStart = () => {
     this.setState({ start: undefined })
+    this.resetProcess()
+  }
+
+  resetProcess = () => {
+    this.setState({ realignments: [] })
+  }
+
+  reset = () => {
+    this.setState(INITIAL_STATE)
+  }
+
+  downloadRealignment(id) {
+    const realignment = this.state.realignments.find(r => r.id === id)
+    download(realignment.id, realignment.data)
+  }
+
+  downloadAllRealignments = () => {
+    this.state.realignments.forEach(realignment => {
+      download(realignment.id, realignment.data)
+    })
   }
 
   onSelectFiles = () => {
@@ -107,21 +136,54 @@ class App extends Component {
         const data = content.trim().toUpperCase()
         const start = { ...this.state.start, isValid: isATCG(data), isLoading: false, data }
 
-        this.setState({
-          start: start
-        })
+        if (data.length < 50) {
+          this.setState({ startMessage: 'Start sequence must have a minimum length of 50' })
+          return
+        }
+
+        this.setState({ start, startMessage: undefined })
 
       })
     })
   }
 
   onEnterStart = (value) => {
-    const start = { type: ENTRY_TYPE.TEXT, id: 'text', isLoading: false, data: value.toUpperCase() }
+    if (value.length < 50) {
+      this.setState({ startMessage: 'Start sequence must have a minimum length of 50' })
+      return
+    }
 
-    this.setState({ start })
+    const start = {
+      type: ENTRY_TYPE.TEXT,
+      id: 'text',
+      isValid: true,
+      isLoading: false,
+      data: value.toUpperCase()
+    }
+
+    this.setState({ start, startMessage: undefined })
   }
 
   onClickProcess = () => {
+    const { entries, start } = this.state
+
+    const realignments = entries.map(entry => {
+      const { success, result } = realignFasta(entry.data, start.data)
+      const isReversed = success && result.isReversed
+
+      if (success)
+        console.assert(result.sequence.length === entry.data.sequence.length)
+
+      return {
+        success: success,
+        id: getName(entry, isReversed),
+        entry: entry,
+        isReversed: isReversed,
+        data: success && fastaToString(result),
+      }
+    })
+
+    this.setState({ realignments })
   }
 
   renderInputStep() {
@@ -151,17 +213,20 @@ class App extends Component {
           {
             entries.map(entry =>
               <div key={entry.id} className='Entry'>
-                <div className='Entry__id'>
+                <div className='Entry__icon'>
                   { entry.isValid &&
-                    <Icon name={getEntryIconName(entry.type)} />
+                    <Icon name={getEntryIconName(entry.type)} muted />
                   }
                   { !entry.isValid &&
                     <Icon name='exclamation-triangle' error />
                   }
-                  {' '}
-                  {entry.id}
                 </div>
-                <div className='Entry__icon'>
+                <div className='Entry__id' ref={onRefEllipsis}>
+                  <div className='Entry__id__content'>
+                    {entry.id}
+                  </div>
+                </div>
+                <div className='Entry__button'>
                   <Button
                     flat
                     icon='close'
@@ -182,7 +247,7 @@ class App extends Component {
           }
           {
             entries.length > 0 &&
-              <button className='link' onClick={this.unsetEntries}>
+              <button className='link' onClick={this.resetInput}>
                 Change
               </button>
           }
@@ -192,7 +257,7 @@ class App extends Component {
   }
 
   renderStartStep() {
-    const { entries, start } = this.state
+    const { entries, start, startMessage } = this.state
 
     const isActive = entries.length > 0 && !entries.some(e => e.isValid === false)
     const className = cx('Step', { active: isActive })
@@ -209,13 +274,20 @@ class App extends Component {
               </Button>
               <div className='Step__or'>OR</div>
               <Input
-                className='MainInput'
+                className='MainInput margin-bottom-1'
                 placeholder='Paste it: AACGATCGACTGATC'
                 pattern='[atcgATCG]'
                 disabled={!isActive}
                 onKeyPress={onKeyPressFilterATCG}
                 onEnter={this.onEnterStart}
               />
+
+              {
+                startMessage !== undefined &&
+                  <p className='text-warning bold'>
+                    {startMessage}
+                  </p>
+              }
             </div>
         }
         {
@@ -227,7 +299,7 @@ class App extends Component {
               <div className='StartStep__length'>
                 Length: {start.data.length} bases
               </div>
-              <button className='link' onClick={this.unsetStart}>
+              <button className='link' onClick={this.resetStart}>
                 Change
               </button>
             </div>
@@ -259,7 +331,7 @@ class App extends Component {
               }
               {
                 !start.isLoading &&
-                  <button className='link' onClick={this.unsetStart}>
+                  <button className='link' onClick={this.resetStart}>
                     Change
                   </button>
               }
@@ -270,25 +342,94 @@ class App extends Component {
   }
 
   renderProcessStep() {
-    const { entries, start } = this.state
+    const { entries, start, realignments } = this.state
 
-    const shouldActivate = entries.length > 0 && (start !== undefined && start.isValid)
+    const shouldActivate =
+      (entries.length > 0 && entries.every(e => e.isValid))
+      && (start !== undefined && start.isValid)
     const isLoading = shouldActivate && (entries.some(e => e.isLoading) || (start !== undefined && start.isLoading))
     const isActive = shouldActivate && !isLoading
+
+    const hasUnsuccessfulRealignments = realignments.some(r => r.success === false)
+    const hasSuccessfulRealignments = realignments.some(r => r.success === true)
 
     return (
       <div className={cx('Step', { active: isActive })}>
         <div className='Step__separator'/>
         <img className='Step__icon' src={cachedIcon} alt='Process' />
-        <div className='Step__content'>
-          <Button className='main'
-            disabled={!isActive}
-            loading={isLoading}
-            onClick={this.onClickProcess}
-          >
-            Re-Align
-          </Button>
-        </div>
+        {
+          realignments.length === 0 &&
+            <div className='Step__content'>
+              <Button className='main'
+                disabled={!isActive}
+                loading={isLoading}
+                onClick={this.onClickProcess}
+              >
+                Re-Align
+              </Button>
+            </div>
+        }
+        {
+          realignments.length !== 0 &&
+            <div className='Step__content'>
+
+              <div className='ProcessStep__entries'>
+              {
+                realignments.map(realignment =>
+                  <div key={realignment.id} className='Entry'>
+                    <div className='Entry__icon'>
+                      { realignment.success &&
+                        <Icon name='check' success />
+                      }
+                      { !realignment.success &&
+                        <Icon name='exclamation-triangle' error />
+                      }
+                    </div>
+                    <div className='Entry__id' ref={onRefEllipsis}>
+                      <div className='Entry__id__content'>
+                        {realignment.id}
+                      </div>
+                    </div>
+                    <div className='Entry__button'>
+                      {
+                        realignment.success &&
+                          <Button
+                            flat
+                            icon='download'
+                            iconButton
+                            onClick={() => this.downloadRealignment(realignment.id)}
+                          />
+                      }
+                    </div>
+                  </div>
+                )
+              }
+              </div>
+              {
+                (hasUnsuccessfulRealignments && hasSuccessfulRealignments) &&
+                  <p className='text-warning bold'>
+                    Start sequence was not found on some files.
+                  </p>
+              }
+              {
+                (hasUnsuccessfulRealignments && !hasSuccessfulRealignments) &&
+                  <p className='text-error bold'>
+                    Start sequence was not found on any file.
+                  </p>
+              }
+              <Button
+                className='main ProcessStep__download'
+                icon='download'
+                disabled={!hasSuccessfulRealignments}
+                onClick={this.downloadAllRealignments}
+              >
+                Download
+              </Button>
+              <button className='link' onClick={this.reset}>
+                Reset
+              </button>
+            </div>
+        }
       </div>
     )
   }
@@ -337,6 +478,51 @@ function onKeyPressFilterATCG(ev) {
 
   if (key.length === 1 && !isATCG(key))
     ev.preventDefault()
+}
+
+function getName(entry, isReversed) {
+  let name = entry.type === ENTRY_TYPE.ACCESSION ? entry.id + '.fasta' : entry.id
+
+  if (isReversed) {
+    const extname = path.extname(name)
+    const basename = name.slice(0, name.length - extname.length)
+    name = `${basename}.reversed${extname}`
+  }
+
+  {
+    const extname = path.extname(name)
+    const basename = name.slice(0, name.length - extname.length)
+    name = `${basename}.realigned${extname}`
+  }
+
+  return name
+}
+
+function onRefEllipsis(ref) {
+  if (!ref)
+    return
+
+  const element = ref
+  const child = element.children[0]
+  const box = element.getBoundingClientRect()
+  const text = child.textContent
+
+  let count = 0
+  let childBox = child.getBoundingClientRect()
+
+  while (childBox.width > box.width) {
+    count++
+
+    const length = text.length - count
+    const startLength = Math.ceil(length / 2)
+    const endLength = Math.floor(length / 2)
+
+    child.textContent = truncateMiddle(text, startLength, endLength, '…')
+
+    childBox = child.getBoundingClientRect()
+  }
+
+  element.title = text
 }
 
 export default App;

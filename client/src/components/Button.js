@@ -73,7 +73,7 @@ function Button(props) {
       disabled={loading || disabled}
       {...rest}
     >
-      { icon !== undefined && ((iconButton && !loading) || (!iconButton && loading)) &&
+      { icon !== undefined && ((iconButton && !loading) || !iconButton) &&
           <Icon name={icon} marginRight={(round || square) ? 0 : 5} className='Button__icon' /> }
       {
         children &&

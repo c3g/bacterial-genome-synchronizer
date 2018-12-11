@@ -95,6 +95,15 @@
 }
 
 
+.ProcessStep__entries {
+  margin-bottom: 1em;
+  width: 100%;
+}
+.ProcessStep__download {
+  margin-bottom: 1em !important;
+}
+
+
 .StartStep__value {
   height: 40px;
   line-height: 40px;
@@ -154,11 +163,18 @@
   text-align: left;
   align-items: center;
 }
+.Entry__icon {
+  margin-right: 0.25em;
+}
 .Entry__id {
   flex: 1;
+  display: flex;
   font-weight: bold;
   white-space: nowrap;
+  overflow: hidden;
+  align-items: center;
 }
-.Entry__icon .Button {
+// .Entry__id__content {}
+.Entry__button .Button {
   color: white !important;
 }

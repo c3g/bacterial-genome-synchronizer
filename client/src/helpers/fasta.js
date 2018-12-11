@@ -6,18 +6,20 @@
  * @typedef {Object} Fasta
  * @property {string} description
  * @property {string} genome
+ * @property {boolean} [isReversed]
  */
 
 /**
- * @typedef {Object} ValidationResult
+ * @typedef {Object} ValidationResult<T>
  * @property {boolean} success
- * @property {any} result
+ * @property {T} result
  */
 
 
 /**
  * @param {Fasta} fasta
  * @param {string} sequence
+ * @returns {ValidationResult<Fasta>}
  */
 export function realignFasta(fasta, sequence) {
   let index = fasta.sequence.indexOf(sequence)
@@ -56,8 +58,22 @@ export function reverseComplement(sequence) {
   })).reverse().join('')
 }
 
+/**
+ * @param {Fasta} fasta
+ * @returns {string} fasta file string
+ */
 export function fastaToString(fasta) {
-  
+  const LINE_LENGTH = 70
+
+  let result = fasta.description + '\n'
+
+  let i;
+  for (i = 0; (i + LINE_LENGTH) < fasta.sequence.length; i += LINE_LENGTH) {
+    result += fasta.sequence.slice(i, i + LINE_LENGTH) + '\n'
+  }
+  result += fasta.sequence.slice(i)
+
+  return result
 }
 
 export function validateFastaFile(text) {
