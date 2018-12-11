@@ -204,7 +204,6 @@ class App extends Component {
                 <Input
                   className='MainInput'
                   placeholder='Paste accession numbers'
-                  defaultValue='NC_021834.1 NZ_CP022077.1'
                   onEnter={this.onEnterAccession}
                 />
               </div>
@@ -275,7 +274,7 @@ class App extends Component {
               <div className='Step__or'>OR</div>
               <Input
                 className='MainInput margin-bottom-1'
-                placeholder='Paste it: AACGATCGACTGATC'
+                placeholder='Paste it: AACGAT…'
                 pattern='[atcgATCG]'
                 disabled={!isActive}
                 onKeyPress={onKeyPressFilterATCG}
@@ -437,7 +436,7 @@ class App extends Component {
   render() {
     return (
       <div className='App'>
-        <header className='App__header'>
+        <main className='App__main'>
 
           <div className='App__steps row'>
 
@@ -447,7 +446,10 @@ class App extends Component {
 
           </div>
 
-        </header>
+        </main>
+        <footer className='App__footer'>
+          <span>Made with <span className='text-error'>❤️</span> in Montréal</span>
+        </footer>
       </div>
     );
   }
