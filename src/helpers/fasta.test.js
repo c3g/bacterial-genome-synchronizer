@@ -2,7 +2,7 @@
  * fasta.test.js
  */
 
-import { fastaToString, validateFastaFile, realignFasta, reverseComplement } from './fasta.js'
+import { fastaToString, isAllowed, validateFastaFile, realignFasta, reverseComplement } from './fasta.js'
 
 const file1 =
 `>NZ_CP022077.1 Campylobacter jejuni subsp. jejuni strain FDAARGOS_263 chromosome, complete genome
@@ -17,7 +17,7 @@ AAAAAAAAACCGTAAAA`
 
 const badFastaFile =
 `>TEST for a bad fasta file
-TCTTATGATTTTATCTTAAAATCAGACTTAAAAGAGGAAACCACCCTAAAAHCGATGCTACGTACGTACG
+TCTTATGATTTTATCTTAAZZZZZZZZZZZZZZZZZOZZZZZZZZZZZZZZZCGATGCTACGTACGTACG
 TCTTATGATTTTATCTTAAAATCAGACTTAAAAGAGGAAACCACCCTAAAAGCTAGCATCTAGCATCTAG`
 
 const badFile =
@@ -28,6 +28,29 @@ const startSequence    = `CGT`
 const startSequenceRev = `ACG`
 
 
+
+describe('isAllowed()', () => {
+
+  test('works with good input', () => {
+    const result = isAllowed('ACBDFKLJFHLUAEHLU')
+    expect(result).toBe(true)
+  })
+
+  test('works with bad letters input', () => {
+    const result = isAllowed('ACBDFKLJFHLUAEHLUO')
+    expect(result).toBe(false)
+  })
+
+  test('works with bad numbers input', () => {
+    const result = isAllowed('AAAA7AAAA')
+    expect(result).toBe(false)
+  })
+
+  test('works with bad chars input', () => {
+    const result = isAllowed('AAAA AAAA')
+    expect(result).toBe(false)
+  })
+})
 
 describe('validateFastaFile()', () => {
 

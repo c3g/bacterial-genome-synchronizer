@@ -83,7 +83,7 @@ export function validateFastaFile(text) {
   const lines = text.split('\n')
   const lastLines = lines.slice(1)
 
-  if (lines[0].startsWith('>') && lastLines.every(isATCGorEmpty)) {
+  if (lines[0].startsWith('>') && lastLines.every(isAllowedOrEmpty)) {
     isFastaFile = true
     result = {
       description: lines[0],
@@ -94,25 +94,61 @@ export function validateFastaFile(text) {
   return { success: isFastaFile, result }
 }
 
-export function isATCGorEmpty(text) {
-  if (text.length === 0)
-    return true
-  return isATCG(text)
-}
-
-export function isATCG(text) {
+export function isAllowed(text) {
   for (let i = 0; i < text.length; i++) {
-    if (
-         text[i] !== 'a'
-      && text[i] !== 't'
-      && text[i] !== 'c'
-      && text[i] !== 'g'
-      && text[i] !== 'A'
-      && text[i] !== 'T'
-      && text[i] !== 'C'
-      && text[i] !== 'G'
-    )
+    if (!isAllowedCode(text.charCodeAt(i)))
       return false
   }
   return true
 }
+
+function isAllowedOrEmpty(text) {
+  if (text.length === 0)
+    return true
+  return isAllowed(text)
+}
+
+function isAllowedChar(c) {
+  const code = c.charCodeAt(0)
+  return isAllowedCode(code)
+}
+
+function isAllowedCode(code) {
+  if (
+       (code >= 65 /* A */ && code <= 78 /* N */)
+    || (code >= 80 /* P */ && code <= 90 /* Z */)
+    || (code >= 97 /* a */ && code <= 110 /* n */)
+    || (code >= 112 /* p */ && code <= 122 /* z */)
+    || (code === 42 /* * */)
+    || (code === 45 /* - */)
+  )
+    return true
+  return false
+}
+
+/*
+ * Fasta format allowed chars:
+
+        A  adenosine          C  cytidine             G  guanine
+        T  thymidine          N  A/G/C/T (any)        U  uridine
+        K  G/T (keto)         S  G/C (strong)         Y  T/C (pyrimidine)
+        M  A/C (amino)        W  A/T (weak)           R  G/A (purine)
+        B  G/T/C              D  G/A/T                H  A/C/T
+        V  G/C/A              -  gap of indeterminate length
+
+  For those programs that use amino acid query sequences (BLASTP and TBLASTN), the accepted amino acid codes are:
+
+        A  alanine               P  proline
+        B  aspartate/asparagine  Q  glutamine
+        C  cystine               R  arginine
+        D  aspartate             S  serine
+        E  glutamate             T  threonine
+        F  phenylalanine         U  selenocysteine
+        G  glycine               V  valine
+        H  histidine             W  tryptophan
+        I  isoleucine            Y  tyrosine
+        K  lysine                Z  glutamate/glutamine
+        L  leucine               X  any
+        M  methionine            *  translation stop
+        N  asparagine            -  gap of indeterminate length
+*/

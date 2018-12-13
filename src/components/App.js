@@ -16,7 +16,7 @@ import download from '../helpers/download'
 import openFile from '../helpers/open-file'
 import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
-import { fastaToString, realignFasta, validateFastaFile, isATCG } from '../helpers/fasta'
+import { fastaToString, realignFasta, validateFastaFile, isAllowed } from '../helpers/fasta'
 
 const ENTRY_TYPE = {
   ACCESSION: 'ACCESSION',
@@ -134,10 +134,15 @@ class App extends Component {
       readFileAsText(file)
       .then(content => {
         const data = content.trim().toUpperCase()
-        const start = { ...this.state.start, isValid: isATCG(data), isLoading: false, data }
+        const start = { ...this.state.start, isValid: isAllowed(data), isLoading: false, data }
 
         if (data.length < 50) {
-          this.setState({ start: undefined, startMessage: 'Start sequence must have a minimum length of 50' })
+          this.setState({ start: undefined, startMessage: 'File must have a minimum length of 50 characters' })
+          return
+        }
+
+        if (!start.isValid) {
+          this.setState({ start: undefined, startMessage: 'File contains invalid characters' })
           return
         }
 
@@ -154,7 +159,12 @@ class App extends Component {
 
   onEnterStart = (value) => {
     if (value.length < 50) {
-      this.setState({ startMessage: 'Start sequence must have a minimum length of 50' })
+      this.setState({ startMessage: 'Sequence must have a minimum length of 50 characters' })
+      return
+    }
+
+    if (!isAllowed(value)) {
+      this.setState({ start: undefined, startMessage: 'Sequence contains invalid characters' })
       return
     }
 
@@ -480,15 +490,14 @@ function getEntryIconName(entryType) {
 }
 
 function onKeyPressFilterATCG(ev) {
-  const { altKey, ctrlKey, shiftKey, metaKey, key, code } = ev
-  console.log(altKey, ctrlKey, shiftKey, metaKey, key, code)
+  const { altKey, ctrlKey, metaKey, key, code } = ev
+  console.log(altKey, ctrlKey, metaKey, key, code)
 
   if (
        altKey === false
     && ctrlKey === false
-    && shiftKey === false
     && metaKey === false
-    && key.length === 1 && !isATCG(key)
+    && key.length === 1 && !isAllowed(key)
   )
     ev.preventDefault()
 }
