@@ -15,13 +15,13 @@ class Input extends React.Component {
     super(props)
 
     this.state = {
-      value: props.defaultValue,
+      value: props.defaultValue || '',
     }
   }
 
   componentWillReceiveProps(props) {
     if (props.defaultValue !== this.props.defaultValue)
-      this.setState({ value: props.defaultValue })
+      this.setState({ value: props.defaultValue || '' })
   }
 
   focus() {
