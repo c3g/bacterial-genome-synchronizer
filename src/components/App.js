@@ -137,12 +137,17 @@ class App extends Component {
         const start = { ...this.state.start, isValid: isATCG(data), isLoading: false, data }
 
         if (data.length < 50) {
-          this.setState({ startMessage: 'Start sequence must have a minimum length of 50' })
+          this.setState({ start: undefined, startMessage: 'Start sequence must have a minimum length of 50' })
           return
         }
 
         this.setState({ start, startMessage: undefined })
-
+      })
+      .catch(err => {
+        this.setState({
+          start: undefined,
+          startMessage: `Error while reading file: ${err.message}`
+        })
       })
     })
   }
@@ -275,7 +280,6 @@ class App extends Component {
               <Input
                 className='MainInput margin-bottom-1'
                 placeholder='Paste it: AACGAT…'
-                pattern='[atcgATCG]'
                 disabled={!isActive}
                 onKeyPress={onKeyPressFilterATCG}
                 onEnter={this.onEnterStart}
@@ -284,7 +288,7 @@ class App extends Component {
               {
                 startMessage !== undefined &&
                   <p className='text-warning bold'>
-                    {startMessage}
+                    <Icon name='exclamation-triangle' /> {startMessage}
                   </p>
               }
             </div>
@@ -476,9 +480,16 @@ function getEntryIconName(entryType) {
 }
 
 function onKeyPressFilterATCG(ev) {
-  const { key, code } = ev
+  const { altKey, ctrlKey, shiftKey, metaKey, key, code } = ev
+  console.log(altKey, ctrlKey, shiftKey, metaKey, key, code)
 
-  if (key.length === 1 && !isATCG(key))
+  if (
+       altKey === false
+    && ctrlKey === false
+    && shiftKey === false
+    && metaKey === false
+    && key.length === 1 && !isATCG(key)
+  )
     ev.preventDefault()
 }
 
