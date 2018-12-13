@@ -45,9 +45,7 @@
     background-color: opacify($hover-bg-color, 0.1);
   }
 }
-.Button.has-icon {
-  text-align: left;
-}
+// .Button.has-icon {}
 .Button > .Icon:not(:first-child):last-child {
   margin-left: $padding;
 }
