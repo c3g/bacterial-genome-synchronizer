@@ -1,9 +1,10 @@
 import React from 'react'
 import Prop from 'prop-types'
 import classname from 'classname'
+import { equals } from 'ramda'
 
-/* import Button from './Button'
- * import Icon from './Icon' */
+import Button from './Button'
+import Icon from './Icon'
 
 class Input extends React.Component {
   static propTypes = {
@@ -11,25 +12,12 @@ class Input extends React.Component {
     validate: Prop.func,
   }
 
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      value: props.defaultValue || '',
-    }
+  state = {
+    value: '',
   }
 
-  componentWillReceiveProps(props) {
-    if (props.defaultValue !== this.props.defaultValue)
-      this.setState({ value: props.defaultValue || '' })
-  }
-
-  focus() {
-    this.element.focus()
-  }
-
-  select() {
-    this.element.select()
+  shouldComponentUpdate(nextProps) {
+    return !equals(this.props, nextProps)
   }
 
   accept(ev) {
@@ -106,19 +94,16 @@ class Input extends React.Component {
       onEnter,
       validate,
       disabled,
+      forwardedRef,
       ...rest
     } = this.props
     /* eslint-enable no-unused-vars */
 
-    const actualValue =
-      this.props.defaultValue ?
-        undefined :
-        this.getValue()
+    const actualValue = this.getValue()
 
-    const actualStatus =
-      (status || ((validate && actualValue)) ?
-        (validate(actualValue) ? 'success' : 'error') :
-        undefined)
+    const actualStatus = status || ((validate && actualValue) ?
+      (validate(actualValue) ? 'success' : 'error') :
+      undefined)
 
     const inputClassName = classname(
       'Input',
@@ -132,18 +117,9 @@ class Input extends React.Component {
       }
     )
 
-        // { icon && <Icon name={icon} className='Input__icon' /> }
-        // { loading && <span className='loading-spinner-tiny'/> }
-        /* { showClearButton && actualValue &&
-         *   <Button
-         *     iconButton
-         *     className='Input__clearButton'
-         *     icon='times-circle'
-         *     onClick={() => this.change('')}
-         *   />
-         * } */
     return (
       <div className={inputClassName}>
+        { icon && <Icon name={icon} className='Input__icon' /> }
         <input type='text'
           { ...rest }
           className='Input__element'
@@ -153,13 +129,26 @@ class Input extends React.Component {
           onKeyDown={this.props.onKeyDown || this.onKeyDown}
           onFocus={this.onFocus}
           onBlur={this.onBlur}
-          ref={ref => { if (ref) this.element = ref }}
+          ref={forwardedRef}
         />
+        { loading && <span className='loading-spinner-tiny'/> }
+        { showClearButton && actualValue &&
+          <Button
+            iconButton
+            className='Input__clearButton'
+            icon='times-circle'
+            onClick={() => this.change('')}
+          />
+        }
       </div>
     )
   }
 }
 
 
+function forwardRef(props, ref) {
+  return <Input {...props} forwardedRef={ref} />
+}
+forwardRef.displayName = 'Input'
 
-export default Input
+export default React.forwardRef(forwardRef)

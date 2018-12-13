@@ -1,5 +1,7 @@
 @import '../styles/_variables.scss';
 
+$step-width: 220px;
+
 html, body, #root {
   width:  100%;
   height: 100%;
@@ -47,7 +49,7 @@ html, body, #root {
 
 .Step {
   position: relative;
-  width: 200px;
+  width: $step-width;
   display: flex;
   flex-direction: column;
   align-self: stretch;
@@ -83,7 +85,7 @@ html, body, #root {
   position: relative;
   font-size: 1rem;
   font-weight: bold;
-  width: 200px;
+  width: $step-width;
   margin: 2em 0;
   opacity: 0.2;
 }
@@ -139,6 +141,71 @@ html, body, #root {
 }
 
 
+.MainButton {
+  padding: 0 30px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+  border-radius: 3px;
+  text-decoration: none;
+  border: 0;
+  margin: 0;
+  min-width: auto;
+  vertical-align: middle;
+  font-size: inherit;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+  background: #2297DE;
+  color: #fff;
+  height: 36px;
+  transition-property: color,background,border-color;
+  transition-duration: .1s;
+  transition-timing-function: ease-in;
+  outline: none;
+
+  width: $step-width;
+  height: 48px;
+  font-size: 16px;
+  margin: auto;
+  overflow: hidden;
+}
+.MainButton:not([disabled]):hover {
+  color: #fff;
+  background-color: rgba(34,151,222,0.7);
+}
+.MainButton:not([disabled]):active {
+  color: #fff;
+  background-color: hsl(202.70000000000005,74%,40.2%);
+}
+.MainButton[disabled] {
+  pointer-events: none;
+  background-color: #3a3c41;
+  color: #787c7f;
+  cursor: initial;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  box-shadow: none;
+}
+
+
+.InputGroup {
+  display: flex;
+  width: $step-width;
+}
+.InputGroup > .MainButton {
+  width: unset;
+  padding: 0 15px 0 20px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.InputGroup > .MainInput > .Input__element {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
 .MainInput > .Input__element {
   padding: 0 0.5em;
   font-family: inherit;
@@ -160,7 +227,7 @@ html, body, #root {
   transition-timing-function: ease-in;
   outline: none;
 
-  width: 200px;
+  width: 100%;
   height: 48px;
   font-size: 16px;
   margin: auto;
@@ -168,7 +235,7 @@ html, body, #root {
 }
 .MainInput > .Input__element[disabled]{
   background-color: rgb(64, 67, 73);
-  border-color: grey;
+  border: none;
   color: #8b8b8b;
   opacity: 0.65;
 }

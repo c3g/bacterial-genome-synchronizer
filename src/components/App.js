@@ -46,6 +46,9 @@ class App extends Component {
     super(props)
 
     this.state = INITIAL_STATE
+
+    this.inputInput = React.createRef()
+    this.startInput = React.createRef()
   }
 
   addEntry(type, id) {
@@ -107,7 +110,8 @@ class App extends Component {
     })
   }
 
-  onEnterAccession = (value) => {
+  onAcceptAccession = () => {
+    const value = this.inputInput.current.value
     const accessions = value.split(/( +)|( *, *)/).filter(a => Boolean(a) && !/^ *$/.test(a))
     accessions.forEach(accession => {
       this.addEntry(ENTRY_TYPE.ACCESSION, accession)
@@ -115,7 +119,9 @@ class App extends Component {
       fetchNCBI(accession)
       .then(result => {
         this.setState({
-          entries: this.state.entries.map(e => e.id === accession ? ({ ...e, isLoading: false, data: result.data }) : e)
+          entries: this.state.entries.map(e => e.id === accession ?
+            validateEntry(e, result.data) :
+            e)
         })
       })
       .catch(err => {
@@ -157,7 +163,9 @@ class App extends Component {
     })
   }
 
-  onEnterStart = (value) => {
+  onAcceptStart = () => {
+    const value = this.startInput.current.value
+
     if (value.length < 50) {
       this.setState({ startMessage: 'Sequence must have a minimum length of 50 characters' })
       return
@@ -212,15 +220,23 @@ class App extends Component {
           {
             entries.length === 0 &&
               <div>
-                <Button className='main' onClick={this.onSelectFiles}>
+                <Button className='MainButton' onClick={this.onSelectFiles}>
                   Select Files
                 </Button>
                 <div className='Step__or'>OR</div>
-                <Input
-                  className='MainInput'
-                  placeholder='Paste accession numbers'
-                  onEnter={this.onEnterAccession}
-                />
+                <div className='InputGroup'>
+                  <Input
+                    className='MainInput'
+                    placeholder='Paste NCBI numbers'
+                    ref={this.inputInput}
+                    onEnter={this.onAcceptAccession}
+                  />
+                  <Button
+                    className='MainButton'
+                    icon='thumbs-o-up'
+                    onClick={this.onAcceptAccession}
+                  />
+                </div>
               </div>
           }
           <div className='InputStep__entries'>
@@ -283,17 +299,26 @@ class App extends Component {
         {
           start === undefined &&
             <div className='Step__content'>
-              <Button className='main' disabled={!isActive} onClick={this.onSelectStart}>
+              <Button className='MainButton' disabled={!isActive} onClick={this.onSelectStart}>
                 Select Start
               </Button>
               <div className='Step__or'>OR</div>
-              <Input
-                className='MainInput margin-bottom-1'
-                placeholder='Paste it: AACGAT…'
-                disabled={!isActive}
-                onKeyPress={onKeyPressFilterATCG}
-                onEnter={this.onEnterStart}
-              />
+              <div className='InputGroup margin-bottom-1'>
+                <Input
+                  className='MainInput'
+                  placeholder='Paste it: AACGAT…'
+                  disabled={!isActive}
+                  ref={this.startInput}
+                  onKeyPress={onKeyPressFilterATCG}
+                  onEnter={this.onAcceptStart}
+                />
+                <Button
+                  className='MainButton'
+                  icon='thumbs-o-up'
+                  disabled={!isActive}
+                  onClick={this.onAcceptStart}
+                />
+              </div>
 
               {
                 startMessage !== undefined &&
@@ -373,7 +398,7 @@ class App extends Component {
         {
           realignments.length === 0 &&
             <div className='Step__content'>
-              <Button className='main'
+              <Button className='MainButton'
                 disabled={!isActive}
                 loading={isLoading}
                 onClick={this.onClickProcess}
@@ -431,7 +456,7 @@ class App extends Component {
                   </p>
               }
               <Button
-                className='main ProcessStep__download'
+                className='MainButton ProcessStep__download'
                 icon='download'
                 disabled={!hasSuccessfulRealignments}
                 onClick={this.downloadAllRealignments}
