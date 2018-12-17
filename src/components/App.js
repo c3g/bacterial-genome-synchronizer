@@ -9,6 +9,7 @@ import cachedIcon from '../static/baseline-cached-24px.svg';
 
 import './App.scss';
 import Button from './Button'
+import Help from './Help'
 import Icon from './Icon'
 import Input from './Input'
 import Spinner from './Spinner'
@@ -35,6 +36,7 @@ const ENTRY_TYPE = {
 
 
 const INITIAL_STATE = {
+  showHelp: false,
   entries: [],
   start: undefined,
   startMessage: undefined,
@@ -76,6 +78,10 @@ class App extends Component {
 
   reset = () => {
     this.setState(INITIAL_STATE)
+  }
+
+  toggleHelp = () => {
+    this.setState({ showHelp: !this.state.showHelp })
   }
 
   downloadRealignment(id) {
@@ -475,9 +481,19 @@ class App extends Component {
   }
 
   render() {
+    const { showHelp } = this.state
+
     return (
       <div className='App'>
         <main className='App__main'>
+
+          <Button
+            className='App__helpButton'
+            flat
+            iconButton
+            icon={ showHelp ? 'times' : 'question-circle' }
+            onClick={this.toggleHelp}
+          />
 
           <div className='App__steps row'>
 
@@ -485,6 +501,10 @@ class App extends Component {
             { this.renderStartStep() }
             { this.renderProcessStep() }
 
+          </div>
+
+          <div className={cx('App__help', { visible: showHelp } )}>
+            <Help />
           </div>
 
         </main>

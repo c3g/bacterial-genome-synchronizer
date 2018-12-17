@@ -57,23 +57,23 @@
 .Button > .Button__icon {}
 .Button > .Button__iconAfter {}
 
-.Button.flat {
+.Button--flat {
   background-color: transparent;
   color: $color;
   border: 1px solid transparent;
 }
-.Button.flat:not([disabled]):hover {
+.Button--flat:not([disabled]):hover {
   color: $hover-color;
   background-color: $hover-light-bg-color;
 }
-.Button.flat:not([disabled]).active,
-.Button.flat:not([disabled]):active,
-.Button.flat:not([disabled]):focus {
+.Button--flat:not([disabled]).active,
+.Button--flat:not([disabled]):active,
+.Button--flat:not([disabled]):focus {
   outline: none;
   box-shadow: 0 0 0 1px $focus-color;
 }
-.Button.flat:not([disabled]).active,
-.Button.flat:not([disabled]):active {
+.Button--flat:not([disabled]).active,
+.Button--flat:not([disabled]):active {
   background-color: rgba(black, 0.1);
   &:hover {
     background-color: rgba(black, 0.1);
@@ -94,7 +94,7 @@
   text-align: center;
   justify-content: center;
 }
-.Button.iconButton {
+.Button--icon {
   min-width: 30px;
   border-radius: 50%;
   width: 30px;

@@ -46,10 +46,10 @@ function Button(props) {
     size,
     {
       'active': active,
-      'flat': flat,
+      'Button--flat': flat,
       'round': round,
       'square': square,
-      'iconButton': iconButton,
+      'Button--icon': iconButton,
       'center': center,
       'small': small,
       'large': large,
