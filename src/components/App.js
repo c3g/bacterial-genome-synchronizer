@@ -85,7 +85,8 @@ class App extends Component {
 
   downloadAllRealignments = () => {
     this.state.realignments.forEach(realignment => {
-      download(realignment.id, realignment.data)
+      if (realignment.success)
+        download(realignment.id, realignment.data)
     })
   }
 
@@ -390,6 +391,7 @@ class App extends Component {
 
     const hasUnsuccessfulRealignments = realignments.some(r => r.success === false)
     const hasSuccessfulRealignments = realignments.some(r => r.success === true)
+    const successfulRealignments = realignments.filter(r => r.success).length
 
     return (
       <div className={cx('Step', { active: isActive })}>
@@ -423,9 +425,9 @@ class App extends Component {
                         <Icon name='exclamation-triangle' error />
                       }
                     </div>
-                    <div className='Entry__id' ref={onRefEllipsis}>
+                    <div className={cx('Entry__id', { 'text-muted': !realignment.success })} ref={onRefEllipsis}>
                       <div className='Entry__id__content'>
-                        {realignment.id}
+                        {realignment.success ? realignment.id : realignment.entry.id}
                       </div>
                     </div>
                     <div className='Entry__button'>
@@ -461,7 +463,7 @@ class App extends Component {
                 disabled={!hasSuccessfulRealignments}
                 onClick={this.downloadAllRealignments}
               >
-                Download
+                Download ({successfulRealignments})
               </Button>
               <button className='link' onClick={this.reset}>
                 Reset
