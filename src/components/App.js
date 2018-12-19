@@ -151,7 +151,8 @@ class App extends Component {
 
       readFileAsText(file)
       .then(content => {
-        const data = content.trim().toUpperCase()
+        const validation = validateFastaFile(content)
+        const data = validation.success ? validation.result.sequence : prepareStart(content)
         const start = { ...this.state.start, isValid: isAllowed(data), isLoading: false, data }
 
         if (data.length < 50) {
@@ -176,7 +177,7 @@ class App extends Component {
   }
 
   onAcceptStart = () => {
-    const value = this.startInput.current.value
+    const value = prepareStart(this.startInput.current.value)
 
     if (value.length < 50) {
       this.setState({ startMessage: 'Sequence must have a minimum length of 50 characters' })
@@ -542,6 +543,10 @@ function validateEntry(entry, data) {
 
 function failEntry(entry) {
   return { ...entry, isValid: false, isLoading: false, data: undefined }
+}
+
+function prepareStart(value) {
+  return value.replace(/[ \t\n]/g, '').toUpperCase()
 }
 
 function getEntryIconName(entryType) {
