@@ -264,7 +264,7 @@ class App extends Component {
                     <Icon name='exclamation-triangle' error />
                   }
                 </div>
-                <div className={cx('Entry__id', { 'text-error': !entry.isValid })} ref={onRefEllipsis}>
+                <div className={cx('Entry__id', { 'text-muted': !entry.isValid })} ref={onRefEllipsis}>
                   <div className='Entry__id__content'>
                     {entry.id}
                   </div>
@@ -275,6 +275,7 @@ class App extends Component {
                     icon='close'
                     iconButton
                     loading={entry.isLoading}
+                    className={cx({ 'text-error': !entry.isValid })}
                     onClick={() => this.removeEntry(entry.id)}
                   />
                 </div>

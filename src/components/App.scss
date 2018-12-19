@@ -294,3 +294,6 @@ html, body, #root {
 .Entry__button .Button {
   color: white !important;
 }
+.Entry__button .Button.text-error {
+  color: $text-color-error !important;
+}
