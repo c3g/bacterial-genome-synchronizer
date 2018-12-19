@@ -311,7 +311,7 @@ class App extends Component {
   renderStartStep() {
     const { entries, start, startMessage } = this.state
 
-    const isActive = entries.length > 0 && !entries.some(e => e.isValid === false)
+    const isActive = entries.length > 0 && entries.every(e => e.isValid && !e.isLoading)
     const className = cx('Step', { active: isActive })
 
     return (
@@ -478,14 +478,16 @@ class App extends Component {
                     Start sequence was not found on any file.
                   </p>
               }
-              <Button
-                className='MainButton ProcessStep__download'
-                icon='download'
-                disabled={!hasSuccessfulRealignments}
-                onClick={this.downloadAllRealignments}
-              >
-                Download ({successfulRealignments})
-              </Button>
+              <div>
+                <Button
+                  className='MainButton ProcessStep__download'
+                  icon='download'
+                  disabled={!hasSuccessfulRealignments}
+                  onClick={this.downloadAllRealignments}
+                >
+                  Download ({successfulRealignments})
+                </Button>
+              </div>
               <button className='link' onClick={this.reset}>
                 Reset
               </button>
