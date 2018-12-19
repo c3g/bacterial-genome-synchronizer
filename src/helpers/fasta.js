@@ -127,7 +127,7 @@ function isAllowedCode(code) {
 }
 
 /*
- * Fasta format allowed chars:
+   Fasta format allowed chars:
 
         A  adenosine          C  cytidine             G  guanine
         T  thymidine          N  A/G/C/T (any)        U  uridine
