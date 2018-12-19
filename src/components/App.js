@@ -133,6 +133,11 @@ class App extends Component {
       })
       .catch(err => {
         console.error(err)
+        this.setState({
+          entries: this.state.entries.map(e => e.id === accession ?
+            failEntry(e) :
+            e)
+        })
       })
     })
   }
@@ -218,7 +223,8 @@ class App extends Component {
 
   renderInputStep() {
     const { entries } = this.state
-    const hasInvalidEntries = entries.some(e => e.isValid === false)
+    const hasInvalidFiles = entries.some(e => e.type === ENTRY_TYPE.FILE && e.isValid === false)
+    const hasInvalidAccession = entries.some(e => e.type === ENTRY_TYPE.ACCESSION && e.isValid === false)
 
     return (
       <div className='Step active'>
@@ -258,7 +264,7 @@ class App extends Component {
                     <Icon name='exclamation-triangle' error />
                   }
                 </div>
-                <div className='Entry__id' ref={onRefEllipsis}>
+                <div className={cx('Entry__id', { 'text-error': !entry.isValid })} ref={onRefEllipsis}>
                   <div className='Entry__id__content'>
                     {entry.id}
                   </div>
@@ -277,9 +283,16 @@ class App extends Component {
           }
           </div>
           {
-            hasInvalidEntries &&
+            hasInvalidFiles &&
               <p className='text-error bold'>
                 Some files are not FASTA files. Please remove them.
+              </p>
+          }
+          {
+            hasInvalidAccession &&
+              <p className='text-error bold'>
+                Some accession numbers could not be loaded. Check that they
+                are valid and that the network is working.
               </p>
           }
           {
@@ -524,6 +537,10 @@ function validateEntry(entry, data) {
     return { ...entry, isValid: false, isLoading: false, data }
 
   return { ...entry, isValid: true, isLoading: false, data: validation.result }
+}
+
+function failEntry(entry) {
+  return { ...entry, isValid: false, isLoading: false, data: undefined }
 }
 
 function getEntryIconName(entryType) {
