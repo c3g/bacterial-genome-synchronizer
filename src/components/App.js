@@ -526,7 +526,7 @@ class App extends Component {
 
         </main>
         <footer className='App__footer'>
-          <span>Made with <span className='text-error'>❤️</span> in Montréal</span>
+          <span>Made with <span className='text-error'>❤️</span> in Montréal — Based on an original tool by Matthew D'Ioro & Ken Dewar</span>
         </footer>
       </div>
     );
