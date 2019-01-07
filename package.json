@@ -26,6 +26,7 @@
     "build": "react-scripts build && npm run build-sw && npm run build-dist",
     "build-sw": "sw-precache --root=build --static-file-globs='build/static/**/*'",
     "build-dist": "NODE_ENV=production babel -d dist src",
+    "build-and-zip": "PUBLIC_URL=/tools/bacterial-genome-synchronizer npm run build && cd build && zip -r tool.zip * && mv tool.zip ..",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
