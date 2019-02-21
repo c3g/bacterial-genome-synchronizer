@@ -62,6 +62,10 @@ class App extends Component {
     this.setState({ entries: this.state.entries.filter(e => e.id !== id) })
   }
 
+  downloadEntry(entry) {
+    download(`${entry.id}.fasta`, fastaToString(entry.data))
+  }
+
   resetInput = () => {
     this.setState({ entries: [] })
     this.resetProcess()
@@ -212,7 +216,7 @@ class App extends Component {
 
       return {
         success: success,
-        id: getName(entry, isReversed),
+        id: getResultFileName(entry, result),
         entry: entry,
         isReversed: isReversed,
         data: success && fastaToString(result),
@@ -271,9 +275,20 @@ class App extends Component {
                   </div>
                 </div>
                 <div className='Entry__button'>
+                  {
+                    entry.type === ENTRY_TYPE.ACCESSION && !entry.isLoading && entry.isValid &&
+                      <Button
+                        flat
+                        icon='download'
+                        title='Download'
+                        iconButton
+                        onClick={() => this.downloadEntry(entry)}
+                      />
+                  }
                   <Button
                     flat
                     icon='close'
+                    title='Remove'
                     iconButton
                     loading={entry.isLoading}
                     className={cx({ 'text-error': !entry.isValid })}
@@ -299,7 +314,7 @@ class App extends Component {
           }
           {
             entries.length > 0 &&
-              <button className='link' onClick={this.resetInput}>
+              <button className='Step__action link' onClick={this.resetInput}>
                 Change
               </button>
           }
@@ -359,7 +374,7 @@ class App extends Component {
               <div className='StartStep__length'>
                 Length: {start.data.length} bases
               </div>
-              <button className='link' onClick={this.resetStart}>
+              <button className='Step__action link' onClick={this.resetStart}>
                 Change
               </button>
             </div>
@@ -391,7 +406,7 @@ class App extends Component {
               }
               {
                 !start.isLoading &&
-                  <button className='link' onClick={this.resetStart}>
+                  <button className='Step__action link' onClick={this.resetStart}>
                     Change
                   </button>
               }
@@ -457,6 +472,7 @@ class App extends Component {
                           <Button
                             flat
                             icon='download'
+                            title='Download single file'
                             iconButton
                             onClick={() => this.downloadRealignment(realignment.id)}
                           />
@@ -488,7 +504,7 @@ class App extends Component {
                   Download ({successfulRealignments})
                 </Button>
               </div>
-              <button className='link' onClick={this.reset}>
+              <button className='Step__action link' onClick={this.reset}>
                 Reset
               </button>
             </div>
@@ -574,13 +590,19 @@ function onKeyPressFilterATCG(ev) {
     ev.preventDefault()
 }
 
-function getName(entry, isReversed) {
+function getResultFileName(entry, { isReversed, conversions }) {
   let name = entry.type === ENTRY_TYPE.ACCESSION ? entry.id + '.fasta' : entry.id
 
   if (isReversed) {
     const extname = path.extname(name)
     const basename = name.slice(0, name.length - extname.length)
-    name = `${basename}.reversed${extname}`
+    name = `${basename}.reverseComp${extname}`
+  }
+
+  if (conversions > 0) {
+    const extname = path.extname(name)
+    const basename = name.slice(0, name.length - extname.length)
+    name = `${basename}.${conversions}N${extname}`
   }
 
   {

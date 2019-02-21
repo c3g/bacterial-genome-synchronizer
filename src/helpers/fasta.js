@@ -24,6 +24,7 @@
 export function realignFasta(fasta, sequence) {
   let index = fasta.sequence.indexOf(sequence)
   let isReversed = false
+  let conversionsRef = { value: 0 }
 
   if (index === -1) {
     const reverseSequence = reverseComplement(sequence)
@@ -35,17 +36,17 @@ export function realignFasta(fasta, sequence) {
     return { success: false, result: undefined }
   }
 
-  const input = isReversed ? reverseComplement(fasta.sequence) : fasta.sequence
+  const input = isReversed ? reverseComplement(fasta.sequence, conversionsRef) : fasta.sequence
 
   if (isReversed)
     index = fasta.sequence.length - index - sequence.length
 
   const newSequence = input.slice(index) + input.slice(0, index)
 
-  return { success: true, result: { ...fasta, sequence: newSequence, isReversed } }
+  return { success: true, result: { ...fasta, sequence: newSequence, isReversed, conversions: conversionsRef.value } }
 }
 
-export function reverseComplement(sequence) {
+export function reverseComplement(sequence, conversionsRef = null) {
   return Array.from(sequence.replace(/./g, (char) => {
     switch (char) {
       case 'A': return 'T'
@@ -53,7 +54,9 @@ export function reverseComplement(sequence) {
       case 'G': return 'C'
       case 'C': return 'G'
       default:
-        throw new Error('unreachable')
+        if (conversionsRef !== null)
+          conversionsRef.value += 1
+        return 'N'
     }
   })).reverse().join('')
 }
@@ -106,11 +109,6 @@ function isAllowedOrEmpty(text) {
   if (text.length === 0)
     return true
   return isAllowed(text)
-}
-
-function isAllowedChar(c) {
-  const code = c.charCodeAt(0)
-  return isAllowedCode(code)
 }
 
 function isAllowedCode(code) {

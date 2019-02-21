@@ -1,6 +1,7 @@
 /*
  * fasta.test.js
  */
+/* global describe, test, expect */
 
 import { fastaToString, isAllowed, validateFastaFile, realignFasta, reverseComplement } from './fasta.js'
 
@@ -13,7 +14,7 @@ ATAGGAATTTCTTACATCTATCATTTCAAAATCTGCACCTA`
 
 const file2 =
 `>file 2
-AAAAAAAAACCGTAAAA`
+AAAAAAAAACCGTAAAAXXX`
 
 const badFastaFile =
 `>TEST for a bad fasta file
@@ -21,32 +22,32 @@ TCTTATGATTTTATCTTAAZZZZZZZZZZZZZZZZZOZZZZZZZZZZZZZZZCGATGCTACGTACGTACG
 TCTTATGATTTTATCTTAAAATCAGACTTAAAAGAGGAAACCACCCTAAAAGCTAGCATCTAGCATCTAG`
 
 const badFile =
-`I am a very bad file`
+'I am a very bad file'
 
 // Both come from file2
-const startSequence    = `CGT`
-const startSequenceRev = `ACG`
+const startSequence    = 'CGT'
+const startSequenceRev = 'ACG'
 
 
 
 describe('isAllowed()', () => {
 
-  test('works with good input', () => {
+  test('returns true with good input', () => {
     const result = isAllowed('ACBDFKLJFHLUAEHLU')
     expect(result).toBe(true)
   })
 
-  test('works with bad letters input', () => {
+  test('returns false with bad letters input', () => {
     const result = isAllowed('ACBDFKLJFHLUAEHLUO')
     expect(result).toBe(false)
   })
 
-  test('works with bad numbers input', () => {
+  test('returns false with bad numbers input', () => {
     const result = isAllowed('AAAA7AAAA')
     expect(result).toBe(false)
   })
 
-  test('works with bad chars input', () => {
+  test('returns false with bad chars input', () => {
     const result = isAllowed('AAAA AAAA')
     expect(result).toBe(false)
   })
@@ -57,8 +58,8 @@ describe('validateFastaFile()', () => {
   test('works with fasta files', () => {
     const validation = validateFastaFile(file1)
     expect(validation).toEqual({ success: true, result: {
-      description: `>NZ_CP022077.1 Campylobacter jejuni subsp. jejuni strain FDAARGOS_263 chromosome, complete genome`,
-      sequence: `TTTTTCATCTACCAAAGAGTAAGCTCCGATTAAATCCCCAATTTCTATTGCTTCATATTTAGGAGTTTTTAAACCTTTTAAAAGAGTATTTTCAAGTTCATTTCTACCTATGATCATTTTAGCTCCATTGGGTAATCTTAAATGACGACCATATTTTAAAAGTTGTGCGTCATTAACCTGCATATCTTTGTCAAATTCTATGAAATCTCGATAGGAATTTCTTACATCTATCATTTCAAAATCTGCACCTA`
+      description: '>NZ_CP022077.1 Campylobacter jejuni subsp. jejuni strain FDAARGOS_263 chromosome, complete genome',
+      sequence: 'TTTTTCATCTACCAAAGAGTAAGCTCCGATTAAATCCCCAATTTCTATTGCTTCATATTTAGGAGTTTTTAAACCTTTTAAAAGAGTATTTTCAAGTTCATTTCTACCTATGATCATTTTAGCTCCATTGGGTAATCTTAAATGACGACCATATTTTAAAAGTTGTGCGTCATTAACCTGCATATCTTTGTCAAATTCTATGAAATCTCGATAGGAATTTCTTACATCTATCATTTCAAAATCTGCACCTA'
     }})
   })
 
@@ -89,8 +90,9 @@ describe('realignFasta()', () => {
       success: true,
       result: {
         description: fasta.description,
-        sequence: `CGTAAAAAAAAAAAAAC`,
+        sequence: 'CGTAAAAXXXAAAAAAAAAC',
         isReversed: false,
+        conversions: 0,
       }
     })
   })
@@ -103,8 +105,9 @@ describe('realignFasta()', () => {
       success: true,
       result: {
         description: fasta.description,
-        sequence: `ACGGTTTTTTTTTTTTT`,
+        sequence: 'ACGGTTTTTTTTTNNNTTTT',
         isReversed: true,
+        conversions: 3,
       }
     })
   })
