@@ -216,7 +216,7 @@ class App extends Component {
 
       return {
         success: success,
-        id: getResultFileName(entry, result),
+        id: success ? getResultFileName(entry, result) : entry.id,
         entry: entry,
         isReversed: isReversed,
         data: success && fastaToString(result),
