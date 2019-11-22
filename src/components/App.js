@@ -95,13 +95,13 @@ class App extends Component {
   }
 
   downloadAllRealignments = () => {
-    if (this.state.realignments.length === 1)
-      return download(this.state.realignments[0].id, this.state.realignments[0].data) 
-
     const files =
       this.state.realignments
         .filter(realignment => realignment.success)
         .map(realignment => ({ filename: realignment.id, text: realignment.data }))
+
+    if (files.length === 1)
+      return download(files[0].filename, files[0].text) 
 
     downloadZip(files)
   }
