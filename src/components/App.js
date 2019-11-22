@@ -14,6 +14,7 @@ import Icon from './Icon'
 import Input from './Input'
 import Spinner from './Spinner'
 import download from '../helpers/download'
+import downloadZip from '../helpers/download-zip'
 import openFile from '../helpers/open-file'
 import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
@@ -94,10 +95,13 @@ class App extends Component {
   }
 
   downloadAllRealignments = () => {
-    this.state.realignments.forEach(realignment => {
-      if (realignment.success)
-        download(realignment.id, realignment.data)
-    })
+    if (this.state.realignments.length === 1)
+      return download(this.state.realignments[0].id, this.state.realignments[0].data) 
+
+    const files = this.state.realignments.map(realignment =>
+      ({ filename: realignment.id, text: realignment.data }))
+
+    downloadZip(files)
   }
 
   onSelectFiles = () => {
