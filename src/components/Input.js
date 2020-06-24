@@ -1,7 +1,7 @@
 import React from 'react'
 import Prop from 'prop-types'
 import classname from 'classname'
-import { equals } from 'ramda'
+import { equals } from 'rambda'
 
 import Button from './Button'
 import Icon from './Icon'

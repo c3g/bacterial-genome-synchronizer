@@ -20,6 +20,8 @@ import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
 import { fastaToString, realignFasta, validateFastaFile, isAllowed } from '../helpers/fasta'
 
+const COUNTER_URL = 'http://206.167.180.73/bacterial-genome-synchronizer-counter'
+
 const ENTRY_TYPE = {
   ACCESSION: 'ACCESSION',
   FILE:      'FILE',
@@ -212,6 +214,8 @@ class App extends Component {
 
   onClickProcess = () => {
     const { entries, start } = this.state
+
+    pingCounter()
 
     const realignments = entries.map(entry => {
       const { success, result } = realignFasta(entry.data, start.data)
@@ -646,6 +650,12 @@ function onRefEllipsis(ref) {
   }
 
   element.title = text
+}
+
+function pingCounter() {
+  fetch(COUNTER_URL)
+  .then(() => { console.log('Pinged counter') })
+  .catch(error => { console.error('Error while pinging counter', error) })
 }
 
 export default App;
