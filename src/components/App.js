@@ -20,7 +20,7 @@ import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
 import { fastaToString, realignFasta, validateFastaFile, isAllowed } from '../helpers/fasta'
 
-const COUNTER_URL = 'http://206.167.180.73/bacterial-genome-synchronizer-counter'
+const COUNTER_URL = 'https://206.167.180.73/bacterial-genome-synchronizer-counter'
 
 const ENTRY_TYPE = {
   ACCESSION: 'ACCESSION',
@@ -653,9 +653,12 @@ function onRefEllipsis(ref) {
 }
 
 function pingCounter() {
-  fetch(COUNTER_URL)
-  .then(() => { console.log('Pinged counter') })
-  .catch(error => { console.error('Error while pinging counter', error) })
+  if (navigator.sendBeacon)
+    navigator.sendBeacon(COUNTER_URL)
+  else
+    fetch(COUNTER_URL)
+    .then(() => { console.log('Pinged counter') })
+    .catch(error => { console.error('Error while pinging counter', error) })
 }
 
 export default App;
