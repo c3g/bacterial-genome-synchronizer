@@ -20,7 +20,7 @@ import readFileAsText from '../helpers/read-file-as-text'
 import fetchNCBI from '../helpers/fetch-ncbi'
 import { fastaToString, realignFasta, validateFastaFile, isAllowed } from '../helpers/fasta'
 
-const COUNTER_URL = 'https://206.167.180.73/bacterial-genome-synchronizer-counter'
+const COUNTER_URL = 'https://c3g-funding.vhost38.genap.ca/bacterial-genome-synchronizer-counter'
 
 const ENTRY_TYPE = {
   ACCESSION: 'ACCESSION',
