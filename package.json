@@ -11,7 +11,7 @@
     "flexboxgrid": "^6.3.1",
     "font-awesome": "^4.7.0",
     "jszip": "^3.2.2",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "partial.lenses": "^14.17.0",
     "path": "^0.12.7",
     "rambda": "^2.1.1",
