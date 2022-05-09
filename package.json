@@ -1,5 +1,6 @@
 {
-  "name": "client",
+  "name": "bacterial-genome-synchronizer",
+  "homepage": "http://computationalgenomics.ca/tools/bacterial-genome-synchronizer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
