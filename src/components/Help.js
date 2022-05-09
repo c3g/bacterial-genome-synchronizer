@@ -5,9 +5,6 @@
 
 import React from 'react'
 import pure from 'recompose/pure'
-import cx from 'classname'
-
-import Icon from './Icon'
 
 import './Help.scss'
 
