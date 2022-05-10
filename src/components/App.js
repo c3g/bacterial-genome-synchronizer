@@ -103,7 +103,7 @@ class App extends Component {
         .map(realignment => ({ filename: realignment.id, text: realignment.data }))
 
     if (files.length === 1)
-      return download(files[0].filename, files[0].text) 
+      return download(files[0].filename, files[0].text)
 
     downloadZip(files)
   }
@@ -552,7 +552,7 @@ class App extends Component {
 
         </main>
         <footer className='App__footer'>
-          <span>Made with <span className='text-error'>❤️</span> in Montréal
+          <span>Made with <span className='text-error' role="img" aria-label="heart">❤️</span> in Montréal
             — Implemented by Romain Grégoire, based on an original tool by Matthew D'Iorio & Ken Dewar</span>
         </footer>
       </div>
