@@ -555,6 +555,9 @@ class App extends Component {
           <span>Made with <span className='text-error' role="img" aria-label="heart">❤️</span> in Montréal
             — Implemented by Romain Grégoire, based on an original tool by Matthew D'Iorio & Ken Dewar</span>
         </footer>
+        <div className='App__contact'>
+          If there are any issues, please contact us at microbiome.genome@mcgill.ca
+        </div>
       </div>
     );
   }
