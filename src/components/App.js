@@ -556,7 +556,10 @@ class App extends Component {
             — Implemented by Romain Grégoire, based on an original tool by Matthew D'Iorio & Ken Dewar</span>
         </footer>
         <div className='App__contact'>
-          If there are any issues, please contact us at microbiome.genome@mcgill.ca
+          If there are any issues, please contact us at
+            <a style={{marginLeft: '5px', color: 'white'}} href="mailto:microbiome.genome@mcgill.ca">
+              microbiome.genome@mcgill.ca
+            </a>
         </div>
       </div>
     );
